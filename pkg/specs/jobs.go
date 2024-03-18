@@ -242,7 +242,6 @@ func RestoreReplicaInstance(cluster apiv1.Cluster, nodeSerial int) *batchv1.Job 
 		"/controller/manager",
 		"instance",
 		"restoresnapshot",
-		"--immediate",
 	}
 
 	initCommand = append(initCommand, buildCommonInitJobFlags(cluster)...)
@@ -253,6 +252,12 @@ func RestoreReplicaInstance(cluster apiv1.Cluster, nodeSerial int) *batchv1.Job 
 
 func buildCommonInitJobFlags(cluster apiv1.Cluster) []string {
 	var flags []string
+
+	// todo: nhudson
+	// For now lets set --immediate for Replica Clusters only
+	if cluster.IsReplica() {
+		flags = append(flags, "--immediate")
+	}
 
 	if cluster.ShouldCreateWalArchiveVolume() {
 		flags = append(flags, "--pg-wal", PgWalVolumePgWalPath)
